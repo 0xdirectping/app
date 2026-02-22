@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 
-const X_URL = "https://x.com/0xdirectping_";
+const X_HANDLE = "0xdirectping_";
+const X_URL = `https://x.com/${X_HANDLE}`;
 
 export function Navbar() {
   return (
