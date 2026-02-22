@@ -13,6 +13,7 @@ const statusClass: Record<QuestStatus, string> = {
   1: "status-accepted",
   2: "status-completed",
   3: "status-cancelled",
+  4: "status-disputed",
 };
 
 export default function QuestDetailPage() {
@@ -81,6 +82,24 @@ export default function QuestDetailPage() {
     });
   };
 
+  const handleDispute = () => {
+    writeContract({
+      address: ESCROW_ADDRESS,
+      abi: ESCROW_ABI,
+      functionName: "openDispute",
+      args: [questId],
+    });
+  };
+
+  const handleClaimExpired = () => {
+    writeContract({
+      address: ESCROW_ADDRESS,
+      abi: ESCROW_ABI,
+      functionName: "claimExpiredRefund",
+      args: [questId],
+    });
+  };
+
   return (
     <div className="py-8 max-w-2xl mx-auto">
       <Link href="/quests" className="text-sm text-muted hover:text-foreground mb-6 inline-block">
@@ -145,6 +164,16 @@ export default function QuestDetailPage() {
           {status === 0 && isCreator && (
             <button onClick={handleCancel} disabled={isPending || isConfirming} className="btn-outline flex-1 text-danger disabled:opacity-50">
               {isPending ? "Confirm..." : isConfirming ? "Confirming..." : "Cancel & Refund"}
+            </button>
+          )}
+          {status === 1 && (isCreator || isWorker) && (
+            <button onClick={handleDispute} disabled={isPending || isConfirming} className="btn-outline flex-1 text-amber-600 disabled:opacity-50">
+              {isPending ? "Confirm..." : isConfirming ? "Confirming..." : "Open Dispute"}
+            </button>
+          )}
+          {status === 0 && deadlineDate < new Date() && (
+            <button onClick={handleClaimExpired} disabled={isPending || isConfirming} className="btn-outline flex-1 disabled:opacity-50">
+              {isPending ? "Confirm..." : isConfirming ? "Confirming..." : "Claim Expired Refund"}
             </button>
           )}
         </div>

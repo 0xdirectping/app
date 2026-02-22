@@ -18,6 +18,7 @@ const statusClass: Record<QuestStatus, string> = {
   1: "status-accepted",
   2: "status-completed",
   3: "status-cancelled",
+  4: "status-disputed",
 };
 
 export function QuestCard({ id, description, amount, creator, deadline, status }: QuestCardProps) {

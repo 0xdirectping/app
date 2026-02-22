@@ -126,6 +126,7 @@ body {
 .status-accepted { color: #d97706; }
 .status-completed { color: #4f46e5; }
 .status-cancelled { color: #dc2626; }
+.status-disputed { color: #d97706; }
 
 /* Section header */
 .section-label {
