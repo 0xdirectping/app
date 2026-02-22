@@ -1,0 +1,178 @@
+@import "tailwindcss";
+
+:root {
+  --background: #faf8f5;
+  --foreground: #1a1a2e;
+  --card: #ffffff;
+  --border: #e5e5e5;
+  --muted: #71717a;
+  --accent: #4f46e5;
+  --accent-hover: #4338ca;
+  --accent-shadow: #3730a3;
+  --secondary: #0d9488;
+  --secondary-shadow: #0f766e;
+  --danger: #dc2626;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-border: var(--border);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-danger: var(--danger);
+  --color-secondary: var(--secondary);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+/* Cards */
+.card {
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+}
+
+.card:hover {
+  border-color: #d4d4d8;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 0 #e4e4e7;
+}
+
+/* Featured card — accent border */
+.card-accent {
+  border-color: var(--accent);
+  box-shadow: 3px 3px 0 var(--accent-shadow);
+}
+
+.card-accent:hover {
+  border-color: var(--accent);
+  box-shadow: 4px 4px 0 var(--accent-shadow);
+}
+
+/* Buttons */
+.btn-primary {
+  display: inline-block;
+  background: var(--accent);
+  color: white;
+  padding: 10px 20px;
+  border: 2px solid var(--accent);
+  border-radius: 8px;
+  font-weight: 800;
+  box-shadow: 3px 3px 0 var(--accent-shadow);
+  transition: all 0.12s;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background: var(--accent-hover);
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0 var(--accent-shadow);
+}
+
+.btn-primary:active {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0 var(--accent-shadow);
+}
+
+.btn-outline {
+  display: inline-block;
+  border: 2px solid var(--border);
+  color: var(--foreground);
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 800;
+  box-shadow: 3px 3px 0 #e4e4e7;
+  transition: all 0.12s;
+  cursor: pointer;
+}
+
+.btn-outline:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0 #e4e4e7;
+}
+
+.btn-outline:active {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0 #e4e4e7;
+}
+
+/* Pill badge */
+.pill {
+  display: inline-block;
+  background: var(--accent);
+  color: white;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 4px 12px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Status colors */
+.status-open { color: #0d9488; }
+.status-accepted { color: #d97706; }
+.status-completed { color: #4f46e5; }
+.status-cancelled { color: #dc2626; }
+
+/* Section header */
+.section-label {
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--muted);
+}
+
+/* Inputs */
+input, textarea {
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  color: var(--foreground);
+  width: 100%;
+  font-size: 14px;
+  transition: border-color 0.15s;
+}
+
+input:focus, textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+/* Code block */
+.code-block {
+  background: var(--foreground);
+  color: #faf8f5;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  font-family: var(--font-mono), monospace;
+}
+
+/* Nav link */
+.nav-link {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--muted);
+  transition: color 0.12s;
+  padding: 4px 0;
+}
+
+.nav-link:hover {
+  color: var(--foreground);
+}
