@@ -36,6 +36,7 @@ export default function QuestsPage() {
         description: string;
         deadline: bigint;
         status: number;
+        token: string;
       };
       return { id: i, ...q, status: q.status as QuestStatus };
     })

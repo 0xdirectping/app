@@ -1,0 +1,33 @@
+{
+  "name": "@0xdirectping/sdk",
+  "version": "0.1.1",
+  "description": "TypeScript SDK for the DirectPing escrow protocol on Base. Create quests, lock ETH/USDC, build AI agents that earn onchain.",
+  "type": "module",
+  "license": "MIT",
+  "keywords": ["escrow", "base", "xmtp", "ai-agents", "web3", "viem", "ethereum"],
+  "homepage": "https://0xdirectping.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/0xdirectping/sdk"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": ["dist", "README.md"],
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "viem": "^2.46.2"
+  },
+  "devDependencies": {
+    "tsup": "^8.4.0",
+    "typescript": "^5.8.3"
+  }
+}

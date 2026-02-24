@@ -3,8 +3,7 @@
 import { useParams } from "next/navigation";
 import { useEffect } from "react";
 import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
-import { formatEther } from "viem";
-import { ESCROW_ABI, ESCROW_ADDRESS, STATUS_LABELS, type QuestStatus } from "@/lib/contract";
+import { ESCROW_ABI, ESCROW_ADDRESS, STATUS_LABELS, type QuestStatus, formatTokenAmount, getTokenSymbol } from "@/lib/contract";
 import { XMTPChat } from "@/components/XMTPChat";
 import Link from "next/link";
 
@@ -46,6 +45,7 @@ export default function QuestDetailPage() {
     description: string;
     deadline: bigint;
     status: number;
+    token: string;
   };
 
   const status = q.status as QuestStatus;
@@ -54,6 +54,7 @@ export default function QuestDetailPage() {
   const deadlineDate = new Date(Number(q.deadline) * 1000);
   const otherParty = isCreator ? q.worker : q.creator;
   const showChat = status === 1 && (isCreator || isWorker) && otherParty !== "0x0000000000000000000000000000000000000000";
+  const tokenSymbol = getTokenSymbol(q.token);
 
   const handleAccept = () => {
     writeContract({
@@ -116,7 +117,7 @@ export default function QuestDetailPage() {
             <h1 className="text-xl font-bold mt-1">Quest #{params.id as string}</h1>
           </div>
           <div className="text-right">
-            <div className="text-2xl font-black text-accent">{formatEther(q.amount)} ETH</div>
+            <div className="text-2xl font-black text-accent">{formatTokenAmount(q.amount, q.token)} {tokenSymbol}</div>
             <div className="text-xs text-muted">locked in escrow</div>
           </div>
         </div>

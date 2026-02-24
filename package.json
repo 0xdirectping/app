@@ -3,11 +3,15 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "compile:v3": "solcjs --abi --bin contracts/SimpleEscrowV3.sol -o build/"
   },
   "dependencies": {
     "@rainbow-me/rainbowkit": "^2.2.10",

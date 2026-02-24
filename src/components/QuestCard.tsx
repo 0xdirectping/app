@@ -1,8 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { formatEther } from "viem";
-import { STATUS_LABELS, type QuestStatus } from "@/lib/contract";
+import { STATUS_LABELS, type QuestStatus, formatTokenAmount, getTokenSymbol } from "@/lib/contract";
 
 interface QuestCardProps {
   id: number;
@@ -11,6 +10,7 @@ interface QuestCardProps {
   creator: string;
   deadline: bigint;
   status: QuestStatus;
+  token: string;
 }
 
 const statusClass: Record<QuestStatus, string> = {
@@ -21,9 +21,10 @@ const statusClass: Record<QuestStatus, string> = {
   4: "status-disputed",
 };
 
-export function QuestCard({ id, description, amount, creator, deadline, status }: QuestCardProps) {
+export function QuestCard({ id, description, amount, creator, deadline, status, token }: QuestCardProps) {
   const deadlineDate = new Date(Number(deadline) * 1000);
   const isExpired = deadlineDate < new Date();
+  const tokenSymbol = getTokenSymbol(token);
 
   return (
     <Link href={`/quests/${id}`}>
@@ -41,8 +42,8 @@ export function QuestCard({ id, description, amount, creator, deadline, status }
             </div>
           </div>
           <div className="text-right shrink-0">
-            <div className="text-xl font-black text-accent">{formatEther(amount)}</div>
-            <div className="text-xs font-bold text-muted">ETH</div>
+            <div className="text-xl font-black text-accent">{formatTokenAmount(amount, token)}</div>
+            <div className="text-xs font-bold text-muted">{tokenSymbol}</div>
           </div>
         </div>
       </div>

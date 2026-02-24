@@ -1,9 +1,57 @@
+import { formatEther, formatUnits } from "viem";
+
 export const ESCROW_ADDRESS = process.env.NEXT_PUBLIC_ESCROW_ADDRESS as `0x${string}` || "0x0000000000000000000000000000000000000000";
+
+export const USDC_ADDRESS = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913" as const;
+export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000" as const;
+
+export const ERC20_ABI = [
+  {
+    inputs: [{ internalType: "address", name: "spender", type: "address" }, { internalType: "uint256", name: "amount", type: "uint256" }],
+    name: "approve",
+    outputs: [{ internalType: "bool", name: "", type: "bool" }],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "address", name: "owner", type: "address" }, { internalType: "address", name: "spender", type: "address" }],
+    name: "allowance",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "address", name: "account", type: "address" }],
+    name: "balanceOf",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+] as const;
+
+export function formatTokenAmount(amount: bigint, token: string): string {
+  if (token === ZERO_ADDRESS) {
+    return formatEther(amount);
+  }
+  // USDC = 6 decimals
+  return formatUnits(amount, 6);
+}
+
+export function getTokenSymbol(token: string): string {
+  if (token === ZERO_ADDRESS) return "ETH";
+  if (token.toLowerCase() === USDC_ADDRESS.toLowerCase()) return "USDC";
+  return "TOKEN";
+}
 
 export const ESCROW_ABI = [
   // --- Quest functions ---
   {
-    inputs: [{ internalType: "string", name: "_description", type: "string" }, { internalType: "uint256", name: "_deadline", type: "uint256" }],
+    inputs: [
+      { internalType: "string", name: "_description", type: "string" },
+      { internalType: "uint256", name: "_deadline", type: "uint256" },
+      { internalType: "address", name: "_token", type: "address" },
+      { internalType: "uint256", name: "_amount", type: "uint256" },
+    ],
     name: "createQuest",
     outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
     stateMutability: "payable",
@@ -42,8 +90,9 @@ export const ESCROW_ABI = [
           { internalType: "string", name: "description", type: "string" },
           { internalType: "uint256", name: "deadline", type: "uint256" },
           { internalType: "uint8", name: "status", type: "uint8" },
+          { internalType: "address", name: "token", type: "address" },
         ],
-        internalType: "struct SimpleEscrowV2.Quest",
+        internalType: "struct SimpleEscrowV3.Quest",
         name: "",
         type: "tuple",
       },
@@ -99,7 +148,7 @@ export const ESCROW_ABI = [
           { internalType: "string", name: "description", type: "string" },
           { internalType: "uint256", name: "registeredAt", type: "uint256" },
         ],
-        internalType: "struct SimpleEscrowV2.Agent",
+        internalType: "struct SimpleEscrowV3.Agent",
         name: "",
         type: "tuple",
       },
@@ -130,16 +179,44 @@ export const ESCROW_ABI = [
     type: "function",
   },
   {
+    inputs: [{ internalType: "uint256", name: "_newBps", type: "uint256" }],
+    name: "setFeeBps",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
     inputs: [],
-    name: "accumulatedFees",
+    name: "accumulatedFeesETH",
     outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
     stateMutability: "view",
     type: "function",
   },
   {
     inputs: [],
-    name: "PLATFORM_FEE_BPS",
+    name: "accumulatedFeesUSDC",
     outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "platformFeeBps",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "MAX_FEE_BPS",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "USDC",
+    outputs: [{ internalType: "address", name: "", type: "address" }],
     stateMutability: "view",
     type: "function",
   },
@@ -159,6 +236,7 @@ export const ESCROW_ABI = [
       { indexed: false, internalType: "uint256", name: "amount", type: "uint256" },
       { indexed: false, internalType: "string", name: "description", type: "string" },
       { indexed: false, internalType: "uint256", name: "deadline", type: "uint256" },
+      { indexed: false, internalType: "address", name: "token", type: "address" },
     ],
     name: "QuestCreated",
     type: "event",
@@ -230,9 +308,19 @@ export const ESCROW_ABI = [
     anonymous: false,
     inputs: [
       { indexed: true, internalType: "address", name: "to", type: "address" },
-      { indexed: false, internalType: "uint256", name: "amount", type: "uint256" },
+      { indexed: false, internalType: "uint256", name: "ethAmount", type: "uint256" },
+      { indexed: false, internalType: "uint256", name: "usdcAmount", type: "uint256" },
     ],
     name: "FeesWithdrawn",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: false, internalType: "uint256", name: "oldBps", type: "uint256" },
+      { indexed: false, internalType: "uint256", name: "newBps", type: "uint256" },
+    ],
+    name: "FeeUpdated",
     type: "event",
   },
 ] as const;

@@ -25,7 +25,11 @@ const publicClient = createPublicClient({
 });
 
 async function main() {
-  const contractName = process.argv[2] === "--v1" ? "SimpleEscrow" : "SimpleEscrowV2";
+  const contractName = process.argv.includes("--v1")
+    ? "SimpleEscrow"
+    : process.argv.includes("--v2")
+    ? "SimpleEscrowV2"
+    : "SimpleEscrowV3";
   const abiFile = `build/contracts_${contractName}_sol_${contractName}.abi`;
   const binFile = `build/contracts_${contractName}_sol_${contractName}.bin`;
 
