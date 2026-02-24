@@ -1,12 +1,10 @@
 import type { Hex } from "viem";
 
-export interface ApiConfig {
-  port: number;
+export interface BotConfig {
   walletKey: Hex;
+  xmtpEnv: "production" | "dev";
   baseRpcUrl: string;
   baseRpcUrlFallback?: string;
-  allowedOrigins: string[];
-  logLevel: string;
 }
 
 function requireEnv(name: string): string {
@@ -17,32 +15,31 @@ function requireEnv(name: string): string {
   return value;
 }
 
-export function loadConfig(): ApiConfig {
-  const walletKey = requireEnv("API_WALLET_KEY") as Hex;
+export function loadConfig(): BotConfig {
+  const walletKey = requireEnv("XMTP_WALLET_KEY") as Hex;
 
+  // Validate it looks like a hex private key (0x + 64 hex chars)
   if (!/^0x[a-fA-F0-9]{64}$/.test(walletKey)) {
-    throw new Error("API_WALLET_KEY must be a valid 32-byte hex private key");
+    throw new Error("XMTP_WALLET_KEY must be a valid 32-byte hex private key");
   }
 
-  const port = parseInt(process.env.API_PORT ?? "4021", 10);
-  const allowedOrigins = (
-    process.env.ALLOWED_ORIGINS ?? "https://0xdirectping.com"
-  )
-    .split(",")
-    .map((o) => o.trim())
-    .filter(Boolean);
+  const xmtpEnv = (process.env.XMTP_ENV ?? "production") as
+    | "production"
+    | "dev";
+  if (xmtpEnv !== "production" && xmtpEnv !== "dev") {
+    throw new Error('XMTP_ENV must be "production" or "dev"');
+  }
 
   return {
-    port,
     walletKey,
+    xmtpEnv,
     baseRpcUrl: process.env.BASE_RPC_URL ?? "https://mainnet.base.org",
     baseRpcUrlFallback:
       process.env.BASE_RPC_URL_FALLBACK ?? "https://base.meowrpc.com",
-    allowedOrigins,
-    logLevel: process.env.LOG_LEVEL ?? "info",
   };
 }
 
+/** Redact private keys from log output */
 export function sanitizeLog(text: string): string {
   return text.replace(/0x[a-fA-F0-9]{64}/g, "0x[REDACTED]");
 }

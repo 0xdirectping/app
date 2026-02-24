@@ -1,0 +1,20 @@
+{
+  "name": "@0xdirectping/bot",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "start": "node --import tsx src/index.ts",
+    "dev": "node --watch --import tsx src/index.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@0xdirectping/sdk": "^0.1.1",
+    "@xmtp/agent-sdk": "^2.2.0",
+    "viem": "^2.46.2"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3"
+  }
+}

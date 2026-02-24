@@ -35,7 +35,7 @@ export function mcpRouter(config: ApiConfig): Router {
       }
 
       // New session — create fresh server + transport pair
-      const server = createMcpServer(config.baseRpcUrl);
+      const server = createMcpServer(config.baseRpcUrl, config.walletKey, config.baseRpcUrlFallback);
       const transport = new StreamableHTTPServerTransport({
         sessionIdGenerator: () => randomUUID(),
       });

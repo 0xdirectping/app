@@ -1,7 +1,7 @@
 module.exports = {
   apps: [
     {
-      name: "0xdirectping-api",
+      name: "0xdirectping-worker",
       script: "src/index.ts",
       interpreter: "node",
       node_args: "--env-file=.env --import tsx",

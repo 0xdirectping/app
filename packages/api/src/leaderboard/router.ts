@@ -8,7 +8,7 @@ export function leaderboardRouter(config: ApiConfig): Router {
 
   router.get("/", readRateLimit, async (_req, res, next) => {
     try {
-      const data = await getLeaderboard(config.baseRpcUrl);
+      const data = await getLeaderboard(config.baseRpcUrl, config.baseRpcUrlFallback);
       res.json(data);
     } catch (err) {
       next(err);

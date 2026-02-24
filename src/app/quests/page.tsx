@@ -3,13 +3,14 @@
 import { useReadContract, useReadContracts } from "wagmi";
 import { ESCROW_ABI, ESCROW_ADDRESS, type QuestStatus } from "@/lib/contract";
 import { QuestCard } from "@/components/QuestCard";
+import { CreateQuestForm } from "@/components/CreateQuestForm";
 import { useState } from "react";
-import Link from "next/link";
 
 export default function QuestsPage() {
   const [filter, setFilter] = useState<QuestStatus | "all">("all");
+  const [showForm, setShowForm] = useState(false);
 
-  const { data: questCount } = useReadContract({
+  const { data: questCount, refetch: refetchCount } = useReadContract({
     address: ESCROW_ADDRESS,
     abi: ESCROW_ABI,
     functionName: "questCount",
@@ -17,7 +18,7 @@ export default function QuestsPage() {
 
   const count = questCount ? Number(questCount) : 0;
 
-  const { data: questsData, isLoading } = useReadContracts({
+  const { data: questsData, isLoading, refetch: refetchQuests } = useReadContracts({
     contracts: Array.from({ length: count }, (_, i) => ({
       address: ESCROW_ADDRESS,
       abi: ESCROW_ABI,
@@ -44,6 +45,12 @@ export default function QuestsPage() {
 
   const filtered = filter === "all" ? quests : quests.filter((q) => q.status === filter);
 
+  const handleQuestSuccess = () => {
+    setShowForm(false);
+    refetchCount();
+    refetchQuests();
+  };
+
   return (
     <div className="py-8">
       <div className="flex items-center justify-between mb-8">
@@ -51,10 +58,20 @@ export default function QuestsPage() {
           <h1 className="text-3xl font-black">Quest Board</h1>
           <p className="mt-1 text-sm text-muted">{count} quests posted</p>
         </div>
-        <Link href="/quests/new" className="btn-primary text-sm">
-          + New Quest
-        </Link>
+        <button
+          onClick={() => setShowForm(!showForm)}
+          className={showForm ? "btn-outline text-sm" : "btn-primary text-sm"}
+        >
+          {showForm ? "Cancel" : "+ Post a Quest"}
+        </button>
       </div>
+
+      {/* Inline quest creation form */}
+      {showForm && (
+        <div className="card p-6 mb-8">
+          <CreateQuestForm onSuccess={handleQuestSuccess} />
+        </div>
+      )}
 
       {/* Filters */}
       <div className="flex gap-2 mb-6">
@@ -79,9 +96,12 @@ export default function QuestsPage() {
       ) : filtered.length === 0 ? (
         <div className="card p-12 text-center">
           <p className="text-muted">No quests found</p>
-          <Link href="/quests/new" className="mt-4 inline-block text-accent text-sm hover:underline">
+          <button
+            onClick={() => setShowForm(true)}
+            className="mt-4 inline-block text-accent text-sm hover:underline"
+          >
             Post the first quest
-          </Link>
+          </button>
         </div>
       ) : (
         <div className="space-y-3">

@@ -87,7 +87,7 @@ export default function Home() {
         <h2 className="mb-3 text-2xl font-black">Explore</h2>
         <p className="mb-6 text-muted">Post a quest or browse the board</p>
         <div className="flex flex-wrap justify-center gap-4">
-          <Link href="/quests/new" className="btn-primary px-6 py-3">
+          <Link href="/quests" className="btn-primary px-6 py-3">
             Post a Quest
           </Link>
           <Link href="/quests" className="btn-outline px-6 py-3">

@@ -5,6 +5,7 @@ import type { ApiConfig } from "../config.js";
 import { getPublicClient, getWriteEscrow } from "../shared/escrow.js";
 import { getLogger } from "../shared/logger.js";
 import { isReplayed, markUsed } from "./replay-guard.js";
+import { suggestDeadline, tierToSeconds } from "../shared/deadline.js";
 import type { CreateQuestInput } from "./schemas.js";
 
 // Amount caps
@@ -60,11 +61,17 @@ export function createQuestHandler(config: ApiConfig) {
       }
 
       // 3. Verify payment on-chain
-      const publicClient = getPublicClient(config.baseRpcUrl);
+      const publicClient = getPublicClient(config.baseRpcUrl, config.baseRpcUrlFallback);
 
-      const receipt = await publicClient.getTransactionReceipt({
-        hash: input.paymentTxHash as Hex,
-      });
+      let receipt;
+      try {
+        receipt = await publicClient.getTransactionReceipt({
+          hash: input.paymentTxHash as Hex,
+        });
+      } catch {
+        res.status(400).json({ error: "Transaction not found on-chain" });
+        return;
+      }
 
       if (receipt.status !== "success") {
         res.status(400).json({ error: "Payment transaction failed" });
@@ -72,7 +79,7 @@ export function createQuestHandler(config: ApiConfig) {
       }
 
       // Get the platform wallet address
-      const escrow = getWriteEscrow(config.walletKey, config.baseRpcUrl);
+      const escrow = getWriteEscrow(config.walletKey, config.baseRpcUrl, config.baseRpcUrlFallback);
       const platformAddress =
         escrow.walletClient.account!.address.toLowerCase();
 
@@ -134,9 +141,18 @@ export function createQuestHandler(config: ApiConfig) {
 
       // 5. Create quest on-chain
       const token = isETH ? ZERO_ADDRESS : USDC_ADDRESS;
-      const deadline = BigInt(
-        Math.floor(Date.now() / 1000) + input.deadlineDays * 86400,
-      );
+
+      // Resolve deadline: tier > days > auto-suggest from description
+      let deadlineSeconds: number;
+      if (input.deadlineTier) {
+        deadlineSeconds = tierToSeconds(input.deadlineTier)!;
+      } else if (input.deadlineDays) {
+        deadlineSeconds = input.deadlineDays * 86400;
+      } else {
+        const suggestion = suggestDeadline(input.description);
+        deadlineSeconds = suggestion.seconds;
+      }
+      const deadline = BigInt(Math.floor(Date.now() / 1000) + deadlineSeconds);
 
       // For USDC quests, approve first
       if (!isETH) {
@@ -187,7 +203,7 @@ export function createQuestHandler(config: ApiConfig) {
         description: input.description,
         amount: input.amount,
         token: input.token,
-        deadlineDays: input.deadlineDays,
+        deadlineSeconds: deadlineSeconds,
       });
     } catch (err) {
       logger.error({ err: String(err) }, "x402 create-quest failed");

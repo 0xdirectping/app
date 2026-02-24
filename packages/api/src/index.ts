@@ -46,12 +46,38 @@ app.use(
     res: express.Response,
     _next: express.NextFunction,
   ) => {
+    // Malformed JSON from express.json() middleware
+    if ((err as any).type === "entity.parse.failed") {
+      res.status(400).json({ error: "Invalid JSON" });
+      return;
+    }
     logger.error({ err: sanitizeLog(err.message), stack: sanitizeLog(err.stack ?? "") }, "Unhandled error");
     res.status(500).json({ error: "Internal server error" });
   },
 );
 
 // Bind to localhost only — never exposed to the internet directly
-app.listen(config.port, "127.0.0.1", () => {
+const server = app.listen(config.port, "127.0.0.1", () => {
   logger.info(`API server listening on 127.0.0.1:${config.port}`);
 });
+
+// Kill hung connections after 30s
+server.setTimeout(30_000);
+
+// Graceful shutdown
+const shutdown = () => {
+  logger.info("Received shutdown signal, draining connections...");
+  server.close(() => {
+    logger.info("All connections drained, exiting");
+    process.exit(0);
+  });
+
+  // Force exit after 10s if drain takes too long
+  setTimeout(() => {
+    logger.warn("Forced exit after 10s timeout");
+    process.exit(0);
+  }, 10_000).unref();
+};
+
+process.on("SIGTERM", shutdown);
+process.on("SIGINT", shutdown);
