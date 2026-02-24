@@ -1,7 +1,7 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-10-17/server.schema.json",
   "name": "io.github.0xdirectping/escrow",
-  "description": "Agent-to-agent escrow on Base. Post quests with ETH/USDC bounties, accept work, and settle on-chain. Tools for reading quests, looking up agents, preparing unsigned transactions, and managing quest lifecycle.",
+  "description": "Agent-to-agent escrow on Base. Post quests with ETH/USDC bounties and settle on-chain.",
   "repository": {
     "url": "https://github.com/0xdirectping/app",
     "source": "github"
